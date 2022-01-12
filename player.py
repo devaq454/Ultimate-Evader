@@ -67,6 +67,7 @@ class Player(pygame.sprite.Sprite):
         """Вызывается каждый кадр группой спрайтов"""
 
         self.tick += 1
+        # каждый второй кадр пропускать
         if self.tick % 2 == 0:
             return
         if self.left:

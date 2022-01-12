@@ -1,0 +1,87 @@
+import pygame
+
+WIDTH, HEIGHT = 800, 600
+
+# Координата Y у платформы
+FLOOR = 500
+
+
+class Player(pygame.sprite.Sprite):
+    """Класс игрока"""
+
+    def __init__(self) -> None:
+        """Инициализация класса"""
+
+        pygame.sprite.Sprite.__init__(self)
+        self.side = 30
+        self.image = pygame.Surface((self.side, self.side))
+        self.image.fill((255, 255, 0))
+        self.rect = self.image.get_rect()
+        self.rect.center = 400, 300
+        self.speed_fall = 8
+        self.left = False
+        self.right = False
+        self.is_jump = False
+        self.speed = 10
+        self.jump_ticks = 30
+
+        self.direction = [0, 0]
+
+    def key_left(self) -> None:
+        """Установка флага, что игрок двигается влево"""
+
+        self.left = True
+
+    def key_right(self) -> None:
+        """Установка флага, что игрок двигается вправо"""
+
+        self.right = True
+
+    def key_jump(self) -> None:
+        """Прыжок"""
+
+        if self.check_in_floor():
+            # Если игрок на полу, то совершить прыжок
+            self.is_jump = True
+            self.jump_ticks = 20
+
+    def move_left(self) -> None:
+        """Изменение координаты x при движении влево"""
+
+        self.rect.x = max(self.rect.x - self.speed, 0)
+
+    def move_right(self) -> None:
+        """Изменение координаты x при движении вправо"""
+
+        self.rect.x = min(self.rect.x + self.speed, WIDTH - self.side)
+
+    def check_in_floor(self) -> bool:
+        """Находится ли игрок на платформе"""
+
+        if self.rect.y >= FLOOR - self.side:
+            return True
+        return False
+
+    def update(self) -> None:
+        """Вызывается каждый кадр группой спрайтов"""
+
+        if self.left:
+            self.move_left()
+        if self.right:
+            self.move_right()
+
+        # Прыжок
+        if self.is_jump:
+            if self.jump_ticks == 0:
+                self.is_jump = False
+            else:
+                self.rect.y -= self.jump_ticks ** 2 / 6
+                self.jump_ticks -= 1
+        # Гравитация
+        if not self.check_in_floor():
+            self.rect.y += self.speed_fall
+            self.speed_fall += 2
+            if self.check_in_floor():
+                # Когда Y ниже платформы, то установить игрока на платформу
+                self.speed_fall = 2
+                self.rect.y = FLOOR - self.side

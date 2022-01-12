@@ -11,7 +11,7 @@ def main():
     size = w, h = 800, 600
     screen = pygame.display.set_mode(size)
 
-    fps = 60
+    fps = 120
     clock = pygame.time.Clock()
     clock = pygame.time.Clock()
     running = True

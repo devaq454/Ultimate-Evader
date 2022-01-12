@@ -17,6 +17,7 @@ class Player(pygame.sprite.Sprite):
         self.image = pygame.Surface((self.side, self.side))
         self.image.fill((255, 255, 0))
         self.rect = self.image.get_rect()
+        self.tick = 0
         self.rect.center = 400, 300
         self.speed_fall = 8
         self.left = False
@@ -43,17 +44,17 @@ class Player(pygame.sprite.Sprite):
         if self.check_in_floor():
             # Если игрок на полу, то совершить прыжок
             self.is_jump = True
-            self.jump_ticks = 20
+            self.jump_ticks = 40
 
     def move_left(self) -> None:
         """Изменение координаты x при движении влево"""
 
-        self.rect.x = max(self.rect.x - self.speed, 0)
+        self.rect.x = max(self.rect.x - self.speed, 0 + 5)
 
     def move_right(self) -> None:
         """Изменение координаты x при движении вправо"""
 
-        self.rect.x = min(self.rect.x + self.speed, WIDTH - self.side)
+        self.rect.x = min(self.rect.x + self.speed, WIDTH - self.side - 5)
 
     def check_in_floor(self) -> bool:
         """Находится ли игрок на платформе"""
@@ -65,6 +66,9 @@ class Player(pygame.sprite.Sprite):
     def update(self) -> None:
         """Вызывается каждый кадр группой спрайтов"""
 
+        self.tick += 1
+        if self.tick % 2 == 0:
+            return
         if self.left:
             self.move_left()
         if self.right:
@@ -75,13 +79,13 @@ class Player(pygame.sprite.Sprite):
             if self.jump_ticks == 0:
                 self.is_jump = False
             else:
-                self.rect.y -= self.jump_ticks ** 2 / 6
+                self.rect.y -= self.jump_ticks
                 self.jump_ticks -= 1
         # Гравитация
         if not self.check_in_floor():
             self.rect.y += self.speed_fall
             self.speed_fall += 2
             if self.check_in_floor():
-                # Когда Y ниже платформы, то установить игрока на платформу
+                # Если Y ниже платформы, то установить игрока на платформу
                 self.speed_fall = 2
                 self.rect.y = FLOOR - self.side

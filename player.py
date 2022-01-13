@@ -13,10 +13,13 @@ class Player(pygame.sprite.Sprite):
         """Инициализация класса"""
 
         pygame.sprite.Sprite.__init__(self)
-        self.side = 30
-        self.image = pygame.Surface((self.side, self.side))
-        self.image.fill((255, 255, 0))
+        self.side = 60
+        self.image = pygame.image.load("data/ball.png")
         self.rect = self.image.get_rect()
+        self.image = pygame.transform.scale(self.image, (self.side, self.side))
+        self.rect = self.image.get_rect()
+        self.rect.size = (self.side, self.side)
+        print(self.rect.size)
         self.tick = 0
         self.rect.center = 400, 300
         self.speed_fall = 8
@@ -44,17 +47,17 @@ class Player(pygame.sprite.Sprite):
         if self.check_in_floor():
             # Если игрок на полу, то совершить прыжок
             self.is_jump = True
-            self.jump_ticks = 40
+            self.jump_ticks = 44
 
     def move_left(self) -> None:
         """Изменение координаты x при движении влево"""
 
-        self.rect.x = max(self.rect.x - self.speed, 0 + 5)
+        self.rect.x = max(self.rect.x - self.speed, 0)
 
     def move_right(self) -> None:
         """Изменение координаты x при движении вправо"""
 
-        self.rect.x = min(self.rect.x + self.speed, WIDTH - self.side - 5)
+        self.rect.x = min(self.rect.x + self.speed, WIDTH - self.side)
 
     def check_in_floor(self) -> bool:
         """Находится ли игрок на платформе"""
@@ -70,6 +73,7 @@ class Player(pygame.sprite.Sprite):
         # каждый второй кадр пропускать
         if self.tick % 2 == 0:
             return
+
         if self.left:
             self.move_left()
         if self.right:
@@ -82,6 +86,7 @@ class Player(pygame.sprite.Sprite):
             else:
                 self.rect.y -= self.jump_ticks
                 self.jump_ticks -= 1
+
         # Гравитация
         if not self.check_in_floor():
             self.rect.y += self.speed_fall

@@ -13,7 +13,6 @@ def main():
 
     fps = 120
     clock = pygame.time.Clock()
-    clock = pygame.time.Clock()
     running = True
     player = Player()
 

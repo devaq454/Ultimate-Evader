@@ -1,4 +1,3 @@
-import random
 import math
 
 import pygame
@@ -12,6 +11,7 @@ def main():
     screen = pygame.display.set_mode(size)
 
     fps = 120
+    tick = 0
     clock = pygame.time.Clock()
     running = True
     player = Player()
@@ -20,6 +20,12 @@ def main():
     all_sprites.add(player)
 
     while running:
+        # пропуск каждого второго кадра
+        tick += 1
+        if tick % 2 == 0:
+            clock.tick(fps)
+            continue
+
         for event in pygame.event.get():
             if event.type == pygame.QUIT:
                 running = False

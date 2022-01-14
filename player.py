@@ -19,8 +19,6 @@ class Player(pygame.sprite.Sprite):
         self.image = pygame.transform.scale(self.image, (self.side, self.side))
         self.rect = self.image.get_rect()
         self.rect.size = (self.side, self.side)
-        print(self.rect.size)
-        self.tick = 0
         self.rect.center = 400, 300
         self.speed_fall = 8
         self.left = False
@@ -68,11 +66,6 @@ class Player(pygame.sprite.Sprite):
 
     def update(self) -> None:
         """Вызывается каждый кадр группой спрайтов"""
-
-        self.tick += 1
-        # каждый второй кадр пропускать
-        if self.tick % 2 == 0:
-            return
 
         if self.left:
             self.move_left()

@@ -27,17 +27,28 @@ class Enemy(pygame.sprite.Sprite, ABC):  # TODO мб поменять поряд
         """Возвращяет true, пока снаряд может двигаться."""
         ...
 
-    def create_prediction(self):
-        """Создает место появления снаряда"""
-        pygame.draw.rect(self.screen, (255, 0, 0), (WIDTH - 5, self.rect.y,
-                                                    6, self.rect.y))
+    def create_prediction(self) -> None:
+        """Создает место появления снаряда."""
+
+        if self.rect.y <= (0 - self.rect.size[1]):
+            # Сверху.
+            pygame.draw.rect(self.screen, (255, 0, 0),
+                             (self.rect.x, 0, self.rect.size[0], 5))
+        elif self.rect.x >= WIDTH + self.rect.size[0]:
+            # Справа.
+            pygame.draw.rect(self.screen, (255, 0, 0), (WIDTH - 5, self.rect.y,
+                                                        6, self.rect.size[1]))
+        elif self.rect.x <= (0 - self.rect.size[0]):
+            # Слева.
+            pygame.draw.rect(self.screen, (255, 0, 0),
+                             (0, self.rect.y, 5, self.rect.size[1]))
 
     @abstractmethod
     def move(self) -> None:
         """Двигает снаряд."""
         ...
 
-    def update(self):
+    def update(self) -> None:
         """Вызывается каждый кадр группой спрайтов."""
 
         if self.ticks_to_show == 0:

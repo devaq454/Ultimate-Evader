@@ -33,9 +33,8 @@ score = 0
 last_score = 0
 level = 0
 
-# время респавна снарядов
+# максимальное время респавна снарядов
 respawn_ticks = 4 * fps
-print(respawn_ticks)
 
 # сколько осталось до респавна
 ticks_to_spawn = 0
@@ -49,27 +48,26 @@ while running:
     tick += 1
 
     # каждые 60 * 2 - уровень кадров увеличивать очки на единицу
-    if tick % (fps * 2 - level) == 0:
+    if tick % (fps * 2 - level) <= 0:
         score += 1
 
-    if score % 3 == 0 and 0 < score < 360 and score != last_score:
-        # каждые 3 очка уменьшать на кадр время респавна
-        respawn_ticks -= 1
-        last_score = score
+    respawn_ticks = max(4 * 60 - score, 120)
 
     if level % 2 == 0:
         # каждые 2 уровня изменять задний фон
         change_background()
 
+    level = score // 10
+
     if ticks_to_spawn == 0:
         # если пришло время респавна
         all_sprites.add(random_enemy())
-        ticks_to_spawn = respawn_ticks
+        ticks_to_spawn = random.randrange(60, respawn_ticks)
     else:
         ticks_to_spawn -= 1
 
     if tick % 60 == 0:
-        print(f"{score=} {tick=} {ticks_to_spawn=} {respawn_ticks=}")
+        print(f"{score=} {tick=} {ticks_to_spawn=} {respawn_ticks=} {level=}")
 
     for event in pygame.event.get():
         if event.type == pygame.QUIT:

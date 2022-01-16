@@ -43,7 +43,7 @@ class Enemy(pygame.sprite.Sprite, ABC):
             y = 0
             length_x = self.rect.size[0]
             length_y = 5
-        elif self.rect.x >= WIDTH + self.rect.size[0]:
+        elif self.rect.x >= WIDTH:
             # Справа.
             x = WIDTH - 5
             y = self.rect.y
@@ -62,7 +62,6 @@ class Enemy(pygame.sprite.Sprite, ABC):
     def draw_prediction(self) -> None:
         """Рисует предсказание места появления."""
         rect = self.get_prediction()
-        # TODO
         pygame.draw.rect(self.screen, (255, 0, 0), rect)
 
     @abstractmethod

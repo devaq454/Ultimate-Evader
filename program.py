@@ -3,9 +3,9 @@ import random
 import pygame
 
 import enemies.bullet
+from enemies import enemy
+from enemies import bullet
 from player import Player
-
-from enemies import *
 
 NUMBER_ENEMIES = 1
 
@@ -15,8 +15,13 @@ def change_background() -> None:
     ...
 
 
-def random_enemy() -> enemies.enemy.Enemy:
-    choose = random.randrange(0, NUMBER_ENEMIES)
+def game_over(score) -> None:
+    """Надпись Game Over и количество очков"""
+    ...
+
+
+def random_enemy() -> enemy.Enemy:
+    choose = random.randrange(0, min(NUMBER_ENEMIES, level))
     if choose == 0:
         return enemies.bullet.Bullet(screen)
 
@@ -30,8 +35,10 @@ tick = 0
 clock = pygame.time.Clock()
 running = True
 score = 0
+final_score = -1
 last_score = 0
-level = 0
+level = 1
+is_game_over = False
 
 # максимальное время респавна снарядов
 respawn_ticks = 4 * fps
@@ -45,26 +52,27 @@ all_sprites.add(player)
 
 while running:
     # пока игра работает
-    tick += 1
+    if not is_game_over:
+        tick += 1
 
-    # каждые 60 * 2 - уровень кадров увеличивать очки на единицу
-    if tick % (fps * 2 - level) <= 0:
-        score += 1
+        # каждые 60 * 2 - уровень кадров увеличивать очки на единицу
+        if tick % (fps * 2 - level) <= 0:
+            score += 1
 
-    respawn_ticks = max(4 * 60 - score, 120)
+        respawn_ticks = max(4 * 60 - score, 120)
 
-    if level % 2 == 0:
-        # каждые 2 уровня изменять задний фон
-        change_background()
+        if level % 2 == 0:
+            # каждые 2 уровня изменять задний фон
+            change_background()
 
-    level = score // 10
+        level = score // 10 + 1
 
-    if ticks_to_spawn == 0:
-        # если пришло время респавна
-        all_sprites.add(random_enemy())
-        ticks_to_spawn = random.randrange(60, respawn_ticks)
-    else:
-        ticks_to_spawn -= 1
+        if ticks_to_spawn == 0:
+            # если пришло время респавна
+            all_sprites.add(random_enemy())
+            ticks_to_spawn = random.randrange(60, respawn_ticks)
+        else:
+            ticks_to_spawn -= 1
 
     if tick % 60 == 0:
         print(f"{score=} {tick=} {ticks_to_spawn=} {respawn_ticks=} {level=}")
@@ -84,10 +92,21 @@ while running:
                 player.left = False
             if event.key == pygame.K_RIGHT:
                 player.right = False
-    all_sprites.update()
 
-    screen.fill((0, 0, 0))
-    all_sprites.draw(screen)
-    pygame.display.flip()
+    if is_game_over:
+        # остановить все спрайты; вывести на экран количество очков и надпись: "Game over"
+        if final_score == -1:
+            final_score = score
+
+    else:
+        screen.fill((0, 0, 0))
+        # Отображение очков
+        font = pygame.font.Font(None, 35)
+        text = font.render("Score: " + str(score), True, (255, 255, 255))
+        screen.blit(text, (50, 50))
+
+        all_sprites.update()
+        all_sprites.draw(screen)
+        pygame.display.flip()
     clock.tick(fps)
 pygame.quit()

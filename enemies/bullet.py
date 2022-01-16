@@ -53,5 +53,3 @@ class Bullet(enemy.Enemy):
         elif self.side == 1:
             # Слева направо
             self.rect.x += self.speed
-        pygame.draw.rect(self.screen, (255, 0, 0),
-                         (50, 50, 200, 200))

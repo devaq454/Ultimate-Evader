@@ -3,7 +3,7 @@ import pygame
 WIDTH, HEIGHT = 800, 600
 
 # Координата Y у платформы
-FLOOR = 500
+FLOOR = 513
 
 
 class Player(pygame.sprite.Sprite):

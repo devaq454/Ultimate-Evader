@@ -11,6 +11,7 @@ class Enemy(pygame.sprite.Sprite, ABC):
 
     # время предсказывания снаряда.
     time_prediction = 2 * FPS
+    floor = 513
 
     def __init__(self, screen: pygame.Surface, path_image: str,
                  size: tuple) -> None:

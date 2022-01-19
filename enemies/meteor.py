@@ -12,16 +12,16 @@ class Meteor(enemy.Enemy):
     """Класс метеора"""
 
     def __init__(self, screen):
-        super().__init__(screen, "data/bullet.png", (80, 30))
+        super().__init__(screen, "data/meteor.png", (65, 95))
 
         self.generate_position()
 
         # Скорость пули
-        self.speed = 10
+        self.speed = 8
 
     def generate_position(self):
         self.rect.x = random.randrange(10, WIDTH - self.rect.size[0] - 10)
-        self.rect.y = HEIGHT - self.rect.size[1]
+        self.rect.y = 0 - self.rect.size[1]
 
     def can_move(self) -> bool:
         return self.rect.y <= self.floor - self.rect.size[1]

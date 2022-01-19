@@ -3,7 +3,7 @@ import pygame
 WIDTH, HEIGHT = 800, 600
 
 # Координата Y у платформы
-FLOOR = 513
+FLOOR = 510
 
 
 class Player(pygame.sprite.Sprite):
@@ -15,7 +15,6 @@ class Player(pygame.sprite.Sprite):
         pygame.sprite.Sprite.__init__(self)
         self.side = 60
         self.image = pygame.image.load("data/ball.png")
-        self.rect = self.image.get_rect()
         self.image = pygame.transform.scale(self.image, (self.side, self.side))
         self.rect = self.image.get_rect()
         self.rect.size = (self.side, self.side)

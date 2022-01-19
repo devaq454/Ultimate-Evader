@@ -13,7 +13,7 @@ class Bullet(enemy.Enemy):
     """Класс пули"""
 
     def __init__(self, screen):
-        super().__init__(screen, "data/bullet.png", (80, 30))
+        super().__init__(screen, "data/bullet.png", (80, 25))
         # Где появится пуля. Справа (0), слева (1)
         self.side = random.randrange(0, 2)
 

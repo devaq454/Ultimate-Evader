@@ -2,8 +2,7 @@ import random
 
 import pygame
 
-import enemies.bullet
-from enemies import enemy
+from enemies import enemy, bullet, meteor
 from player import Player
 
 NUMBER_ENEMIES = 2
@@ -41,9 +40,9 @@ class GameScene:
         """Возвращает случайного противника"""
         choose = random.randrange(0, min(NUMBER_ENEMIES, level))
         if choose == 0:
-            return enemies.bullet.Bullet(screen)
-        elif choose == 1:
-            return enemies.meteor.Meteor(screen)
+            return bullet.Bullet(screen)
+        if choose == 1:
+            return meteor.Meteor(screen)
 
 
 pygame.init()
@@ -90,11 +89,13 @@ while running:
 
         level = score // 10 + 1
 
+        enemy.Enemy.time_prediction = max(30, 2 * fps - level * 5)
+
         if ticks_to_spawn == 0:
             # если пришло время респавна
             respawn_ticks = max(4 * 60 - score, 120)
             group_enemies.add(GameScene.random_enemy())
-            ticks_to_spawn = random.randrange(respawn_ticks // 4, respawn_ticks)
+            ticks_to_spawn = random.randrange(respawn_ticks // 8, respawn_ticks // 2)
         else:
             ticks_to_spawn -= 1
 

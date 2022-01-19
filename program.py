@@ -6,7 +6,7 @@ import enemies.bullet
 from enemies import enemy
 from player import Player
 
-NUMBER_ENEMIES = 1
+NUMBER_ENEMIES = 2
 
 
 class GameScene:
@@ -42,6 +42,8 @@ class GameScene:
         choose = random.randrange(0, min(NUMBER_ENEMIES, level))
         if choose == 0:
             return enemies.bullet.Bullet(screen)
+        elif choose == 1:
+            return enemies.meteor.Meteor(screen)
 
 
 pygame.init()

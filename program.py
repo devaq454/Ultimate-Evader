@@ -21,9 +21,8 @@ class GameScene:
     @staticmethod
     def game_over() -> None:
         """Стирает все, кроме заднего фона и спрайтов"""
-        GameScene.draw_background()
-        group_enemies.draw(screen)
-        group_player.draw(screen)
+        global status_pause
+        status_pause = True
         font = pygame.font.Font(None, 80)
         text_game_over = font.render("Game over", True, (50, 50, 200))
         text_score = font.render(f"Score: {final_score}", True, (50, 50, 200))
@@ -44,6 +43,21 @@ class GameScene:
         if choose == 1:
             return meteor.Meteor(screen)
 
+    @staticmethod
+    def draw_sprites() -> None:
+        """Рисует все спрайты"""
+        global status_pause
+        if not status_pause:
+            group_enemies.update()
+        group_enemies.draw(screen)
+        group_player.draw(screen)
+
+    @staticmethod
+    def switch_pause() -> None:
+        """Ставит или снимает с паузы"""
+        global status_pause
+        status_pause = not status_pause
+
 
 pygame.init()
 size = w, h = 800, 600
@@ -55,6 +69,8 @@ tick = 0
 clock = pygame.time.Clock()
 background = GameScene.change_background()
 running = True
+# Статус паузы
+status_pause = True
 score = 0
 final_score = -1
 level = 1
@@ -75,7 +91,7 @@ group_enemies = pygame.sprite.Group()
 
 while running:
     # пока игра работает
-    if not is_game_over:
+    if not status_pause:
         tick += 1
 
         # каждые (60 * 2 - уровень) кадров увеличивать очки на единицу
@@ -95,7 +111,8 @@ while running:
             # если пришло время респавна
             respawn_ticks = max(4 * 60 - score, 120)
             group_enemies.add(GameScene.random_enemy())
-            ticks_to_spawn = random.randrange(respawn_ticks // 8, respawn_ticks // 2)
+            ticks_to_spawn = random.randrange(respawn_ticks // 8,
+                                              respawn_ticks // 2)
         else:
             ticks_to_spawn -= 1
 
@@ -109,34 +126,34 @@ while running:
                 player.key_right()
             if event.key == pygame.K_UP:
                 player.key_jump()
+            if event.key == pygame.K_SPACE:
+                GameScene.switch_pause()
         if event.type == pygame.KEYUP:
             if event.key == pygame.K_LEFT:
                 player.left = False
             if event.key == pygame.K_RIGHT:
                 player.right = False
 
+    GameScene.draw_background()
     if is_game_over:
         # остановить все спрайты,
         # вывести на экран количество очков и надпись: "Game over"
         if final_score == -1:
             final_score = score
         GameScene.game_over()
-
-    else:
-        # Задний фон
-        GameScene.draw_background()
+    if not status_pause:
+        # group_enemies.update()
+        group_player.update()
+    if not is_game_over:
         # Отображение очков
         font = pygame.font.Font(None, 35)
         text = font.render("Score: " + str(score), True, (255, 255, 255))
         screen.blit(text, (50, 50))
 
-        group_enemies.update()
-        group_player.update()
-        group_player.draw(screen)
-        group_enemies.draw(screen)
-
         if pygame.sprite.spritecollide(player, group_enemies, False):
             is_game_over = True
+    # Вывод на экран всех спрайтов и задний фон
+    GameScene.draw_sprites()
     pygame.display.flip()
     clock.tick(fps)
 pygame.quit()

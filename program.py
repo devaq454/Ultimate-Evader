@@ -11,15 +11,16 @@ NUMBER_ENEMIES = 2
 class GameScene:
     """Статичный класс игровой сцены"""
 
-    @staticmethod
-    def change_background() -> pygame.Surface:
+    @classmethod
+    def change_background(cls) -> pygame.Surface:
         """Устанавливает заданный задний фон, зависящий от уровня"""
+        global background
         background = pygame.image.load('data/background.png')
         background = pygame.transform.scale(background, (w, h))
         return background
 
-    @staticmethod
-    def game_over() -> None:
+    @classmethod
+    def game_over(cls) -> None:
         """Стирает все, кроме заднего фона и спрайтов"""
         global status_pause
         status_pause = True
@@ -29,13 +30,13 @@ class GameScene:
         screen.blit(text_game_over, (250, 200))
         screen.blit(text_score, (300, 300))
 
-    @staticmethod
-    def draw_background() -> None:
+    @classmethod
+    def draw_background(cls) -> None:
         """Каждый кадр рисует задний фон"""
         screen.blit(background, (0, 0))
 
-    @staticmethod
-    def random_enemy() -> enemy.Enemy:
+    @classmethod
+    def random_enemy(cls) -> enemy.Enemy:
         """Возвращает случайного противника"""
         choose = random.randrange(0, min(NUMBER_ENEMIES, level))
         if choose == 0:
@@ -43,8 +44,8 @@ class GameScene:
         if choose == 1:
             return meteor.Meteor(screen)
 
-    @staticmethod
-    def draw_sprites() -> None:
+    @classmethod
+    def draw_sprites(cls) -> None:
         """Рисует все спрайты"""
         global status_pause
         if not status_pause:
@@ -52,11 +53,38 @@ class GameScene:
         group_enemies.draw(screen)
         group_player.draw(screen)
 
-    @staticmethod
-    def switch_pause() -> None:
+    @classmethod
+    def switch_pause(cls) -> None:
         """Ставит или снимает с паузы"""
         global status_pause
         status_pause = not status_pause
+
+    @classmethod
+    def start(cls) -> None:
+        """Все настройки устанавливает в значения по умолчанию"""
+        global tick, background, running, score, status_pause, final_score, level, last_level, is_game_over, respawn_ticks, ticks_to_spawn, player, group_enemies, group_player
+        tick = 0
+        running = True
+        # Статус паузы
+        status_pause = True
+        score = 0
+        final_score = -1
+        level = 1
+        # последний лвл, когда изменялся задний фон
+        last_level = -1
+        is_game_over = False
+
+        # максимальное время респавна снарядов
+        respawn_ticks = 4 * fps
+
+        # сколько осталось до респавна
+        ticks_to_spawn = 0
+        player = Player()
+
+        group_player = pygame.sprite.Group()
+        group_player.add(player)
+        group_enemies = pygame.sprite.Group()
+        background = GameScene.change_background()
 
 
 pygame.init()
@@ -65,8 +93,10 @@ screen = pygame.display.set_mode(size)
 pygame.display.set_caption("Ultimate Evader")
 
 fps = 60
-tick = 0
 clock = pygame.time.Clock()
+
+# значения по умолчанию
+tick = 0
 background = GameScene.change_background()
 running = True
 # Статус паузы
@@ -83,6 +113,7 @@ respawn_ticks = 4 * fps
 
 # сколько осталось до респавна
 ticks_to_spawn = 0
+
 player = Player()
 
 group_player = pygame.sprite.Group()
@@ -113,6 +144,7 @@ while running:
             group_enemies.add(GameScene.random_enemy())
             ticks_to_spawn = random.randrange(respawn_ticks // 8,
                                               respawn_ticks // 2)
+            print(ticks_to_spawn)
         else:
             ticks_to_spawn -= 1
 
@@ -120,6 +152,9 @@ while running:
         if event.type == pygame.QUIT:
             running = False
         if event.type == pygame.KEYDOWN:
+            if status_pause is True and is_game_over is False:
+                # Снятие паузы вначале игры
+                status_pause = False
             if event.key == pygame.K_LEFT:
                 player.key_left()
             if event.key == pygame.K_RIGHT:
@@ -127,7 +162,7 @@ while running:
             if event.key == pygame.K_UP:
                 player.key_jump()
             if event.key == pygame.K_SPACE:
-                GameScene.switch_pause()
+                GameScene.start()
         if event.type == pygame.KEYUP:
             if event.key == pygame.K_LEFT:
                 player.left = False
@@ -142,7 +177,6 @@ while running:
             final_score = score
         GameScene.game_over()
     if not status_pause:
-        # group_enemies.update()
         group_player.update()
     if not is_game_over:
         # Отображение очков

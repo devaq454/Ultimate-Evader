@@ -11,6 +11,7 @@ NUMBER_ENEMIES = 2
 class GameScene:
     """Статичный класс игровой сцены"""
 
+    width, height = 800, 600
     @classmethod
     def change_background(cls) -> pygame.Surface:
         """Устанавливает заданный задний фон, зависящий от уровня"""
@@ -25,10 +26,14 @@ class GameScene:
         global status_pause
         status_pause = True
         font = pygame.font.Font(None, 80)
-        text_game_over = font.render("Game over", True, (50, 50, 200))
-        text_score = font.render(f"Score: {final_score}", True, (50, 50, 200))
-        screen.blit(text_game_over, (250, 200))
-        screen.blit(text_score, (300, 300))
+        color = (50, 50, 200)
+        text_game_over = font.render("Game over", True, color)
+        text_score = font.render(f"Score: {final_score}", True, color)
+        font = pygame.font.Font(None, 50)
+        text_key_restart = font.render("Press R to restart", True, color)
+        screen.blit(text_game_over, (250, 100))
+        screen.blit(text_score, (300, 200))
+        screen.blit(text_key_restart, (20, cls.height - 80))
 
     @classmethod
     def draw_background(cls) -> None:
@@ -155,14 +160,15 @@ while running:
             if status_pause is True and is_game_over is False:
                 # Снятие паузы вначале игры
                 status_pause = False
+            if is_game_over and event.key == pygame.K_r:
+                # Рестарт игры
+                GameScene.start()
             if event.key == pygame.K_LEFT:
                 player.key_left()
             if event.key == pygame.K_RIGHT:
                 player.key_right()
             if event.key == pygame.K_UP:
                 player.key_jump()
-            if event.key == pygame.K_SPACE:
-                GameScene.start()
         if event.type == pygame.KEYUP:
             if event.key == pygame.K_LEFT:
                 player.left = False

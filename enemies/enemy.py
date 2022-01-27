@@ -11,6 +11,8 @@ class Enemy(pygame.sprite.Sprite, ABC):
 
     # время предсказывания снаряда.
     time_prediction = 2 * FPS
+    # время бонуса от яблока
+    time_bonus = 0
     floor = 513
 
     def __init__(self, screen: pygame.Surface, path_image: str,
@@ -78,7 +80,10 @@ class Enemy(pygame.sprite.Sprite, ABC):
             else:
                 self.kill()
         else:
-            if self.ticks_to_show <= self.time_prediction:
+            k = 0
+            if self.time_bonus > 0:
+                k = 60
+            if self.ticks_to_show <= self.time_prediction + k:
                 # создание предсказания место появления снаряда
                 self.draw_prediction()
             self.ticks_to_show -= 1

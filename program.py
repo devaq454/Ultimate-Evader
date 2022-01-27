@@ -3,6 +3,7 @@ import random
 import pygame
 
 from enemies import enemy, bullet, meteor
+from bonuses import apple
 from player import Player
 
 NUMBER_ENEMIES = 2
@@ -12,6 +13,7 @@ class GameScene:
     """Статичный класс игровой сцены"""
 
     width, height = 800, 600
+
     @classmethod
     def change_background(cls) -> pygame.Surface:
         """Устанавливает заданный задний фон, зависящий от уровня"""
@@ -50,6 +52,14 @@ class GameScene:
             return meteor.Meteor(screen)
 
     @classmethod
+    def random_bonus(cls):
+        """Возвращает случайный бонус"""
+        # if random.random() > 0.5:
+        return apple.Apple(screen)
+        # else:
+        #     ...
+
+    @classmethod
     def draw_sprites(cls) -> None:
         """Рисует все спрайты"""
         global status_pause
@@ -57,6 +67,7 @@ class GameScene:
             group_enemies.update()
         group_enemies.draw(screen)
         group_player.draw(screen)
+        group_apples.draw(screen)
 
     @classmethod
     def switch_pause(cls) -> None:
@@ -124,11 +135,16 @@ player = Player()
 group_player = pygame.sprite.Group()
 group_player.add(player)
 group_enemies = pygame.sprite.Group()
+group_apples = pygame.sprite.Group()
 
 while running:
     # пока игра работает
     if not status_pause:
         tick += 1
+
+        # уменьшение времени бонуса
+        if enemy.Enemy.time_bonus:
+            enemy.Enemy.time_bonus -= 1
 
         # каждые (60 * 2 - уровень) кадров увеличивать очки на единицу
         if tick % (fps * 2 - level) <= 0:
@@ -149,7 +165,9 @@ while running:
             group_enemies.add(GameScene.random_enemy())
             ticks_to_spawn = random.randrange(respawn_ticks // 8,
                                               respawn_ticks // 2)
-            print(ticks_to_spawn)
+            if random.random() > 0.9:  # 0.9
+                # спавн бонуса
+                group_apples.add(GameScene.random_bonus())
         else:
             ticks_to_spawn -= 1
 
@@ -184,6 +202,7 @@ while running:
         GameScene.game_over()
     if not status_pause:
         group_player.update()
+        group_apples.update()
     if not is_game_over:
         # Отображение очков
         font = pygame.font.Font(None, 35)
@@ -192,6 +211,8 @@ while running:
 
         if pygame.sprite.spritecollide(player, group_enemies, False):
             is_game_over = True
+        if pygame.sprite.spritecollide(player, group_apples, True):
+            enemy.Enemy.time_bonus = 60 * 6
     # Вывод на экран всех спрайтов и задний фон
     GameScene.draw_sprites()
     pygame.display.flip()

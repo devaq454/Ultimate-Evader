@@ -3,7 +3,7 @@ import random
 import pygame
 
 from enemies import enemy, bullet, meteor
-from bonuses import apple
+from bonuses import apple, clock
 from player import Player
 
 NUMBER_ENEMIES = 2
@@ -54,10 +54,10 @@ class GameScene:
     @classmethod
     def random_bonus(cls):
         """Возвращает случайный бонус"""
-        # if random.random() > 0.5:
-        return apple.Apple(screen)
-        # else:
-        #     ...
+        if random.random() > 0.5:
+            group_apples.add(apple.Apple(screen))
+        else:
+            group_clocks.add(clock.Clock(screen))
 
     @classmethod
     def draw_sprites(cls) -> None:
@@ -68,6 +68,7 @@ class GameScene:
         group_enemies.draw(screen)
         group_player.draw(screen)
         group_apples.draw(screen)
+        group_clocks.draw(screen)
 
     @classmethod
     def switch_pause(cls) -> None:
@@ -78,7 +79,8 @@ class GameScene:
     @classmethod
     def start(cls) -> None:
         """Все настройки устанавливает в значения по умолчанию"""
-        global tick, background, running, score, status_pause, final_score, level, last_level, is_game_over, respawn_ticks, ticks_to_spawn, player, group_enemies, group_player
+        global tick, background, running, score, status_pause, final_score, level, last_level, is_game_over, respawn_ticks, ticks_to_spawn, player, group_enemies, group_player, time_immortality
+        time_immortality = 0
         tick = 0
         running = True
         # Статус паузы
@@ -109,7 +111,7 @@ screen = pygame.display.set_mode(size)
 pygame.display.set_caption("Ultimate Evader")
 
 fps = 60
-clock = pygame.time.Clock()
+pygame_clock = pygame.time.Clock()
 
 # значения по умолчанию
 tick = 0
@@ -120,6 +122,7 @@ status_pause = True
 score = 0
 final_score = -1
 level = 1
+time_immortality = 0
 # последний лвл, когда изменялся задний фон
 last_level = -1
 is_game_over = False
@@ -136,6 +139,7 @@ group_player = pygame.sprite.Group()
 group_player.add(player)
 group_enemies = pygame.sprite.Group()
 group_apples = pygame.sprite.Group()
+group_clocks = pygame.sprite.Group()
 
 while running:
     # пока игра работает
@@ -145,6 +149,10 @@ while running:
         # уменьшение времени бонуса
         if enemy.Enemy.time_bonus:
             enemy.Enemy.time_bonus -= 1
+
+        # уменьшение времени бессмертия
+        if time_immortality:
+            time_immortality -= 1
 
         # каждые (60 * 2 - уровень) кадров увеличивать очки на единицу
         if tick % (fps * 2 - level) <= 0:
@@ -167,7 +175,7 @@ while running:
                                               respawn_ticks // 2)
             if random.random() > 0.9:  # 0.9
                 # спавн бонуса
-                group_apples.add(GameScene.random_bonus())
+                GameScene.random_bonus()
         else:
             ticks_to_spawn -= 1
 
@@ -203,6 +211,7 @@ while running:
     if not status_pause:
         group_player.update()
         group_apples.update()
+        group_clocks.update()
     if not is_game_over:
         # Отображение очков
         font = pygame.font.Font(None, 35)
@@ -210,11 +219,14 @@ while running:
         screen.blit(text, (50, 50))
 
         if pygame.sprite.spritecollide(player, group_enemies, False):
-            is_game_over = True
-        if pygame.sprite.spritecollide(player, group_apples, True):
+            if not time_immortality:
+                is_game_over = True
+        if pygame.sprite.spritecollide(player, group_clocks, True):
             enemy.Enemy.time_bonus = 60 * 6
+        if pygame.sprite.spritecollide(player, group_apples, True):
+            time_immortality = 60 * 3
     # Вывод на экран всех спрайтов и задний фон
     GameScene.draw_sprites()
     pygame.display.flip()
-    clock.tick(fps)
+    pygame_clock.tick(fps)
 pygame.quit()

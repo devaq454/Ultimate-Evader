@@ -28,3 +28,6 @@ class Meteor(enemy.Enemy):
 
     def move(self) -> None:
         self.rect.y += self.speed
+
+    def sound(self) -> None:
+        ...

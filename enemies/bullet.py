@@ -7,10 +7,13 @@ from enemies import enemy
 
 WIDTH, HEIGHT = 800, 600
 FPS = 60
+pygame.mixer.init()
+bullet_sound = pygame.mixer.Sound("data/sound/bullet.mp3")
 
 
 class Bullet(enemy.Enemy):
     """Класс пули"""
+
 
     def __init__(self, screen):
         super().__init__(screen, "data/bullet.png", (80, 25))
@@ -52,3 +55,6 @@ class Bullet(enemy.Enemy):
         elif self.side == 1:
             # Слева направо
             self.rect.x += self.speed
+
+    def sound(self):
+        bullet_sound.play()

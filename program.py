@@ -109,6 +109,14 @@ pygame.init()
 size = w, h = 800, 600
 screen = pygame.display.set_mode(size)
 pygame.display.set_caption("Ultimate Evader")
+pygame.mixer.init()
+music = pygame.mixer.Sound('data/sound/music_theme.mp3')
+apple_sound = pygame.mixer.Sound("data/sound/apple.mp3")
+apple_sound.set_volume(0.3)
+death_sound = pygame.mixer.Sound("data/sound/death.mp3")
+death_sound.set_volume(0.3)
+music.set_volume(0.05)
+music.play(loops=-1)
 
 fps = 60
 pygame_clock = pygame.time.Clock()
@@ -220,11 +228,13 @@ while running:
 
         if pygame.sprite.spritecollide(player, group_enemies, False):
             if not time_immortality:
+                death_sound.play()
                 is_game_over = True
         if pygame.sprite.spritecollide(player, group_clocks, True):
             enemy.Enemy.time_bonus = 60 * 6
         if pygame.sprite.spritecollide(player, group_apples, True):
             time_immortality = 60 * 3
+            apple_sound.play()
     # Вывод на экран всех спрайтов и задний фон
     GameScene.draw_sprites()
     pygame.display.flip()

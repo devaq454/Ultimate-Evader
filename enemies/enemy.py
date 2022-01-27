@@ -71,9 +71,16 @@ class Enemy(pygame.sprite.Sprite, ABC):
     def move(self) -> None:
         """Двигает снаряд."""
 
+    @abstractmethod
+    def sound(self) -> None:
+        """Воспроизводит звук."""
+
     def update(self) -> None:
         """Вызывается каждый кадр группой спрайтов."""
-        if self.ticks_to_show == 0:
+        self.ticks_to_show -= 1
+        if self.ticks_to_show == 5:
+            self.sound()
+        if self.ticks_to_show <= 0:
             # если объект появился
             if self.can_move():
                 self.move()
@@ -86,4 +93,3 @@ class Enemy(pygame.sprite.Sprite, ABC):
             if self.ticks_to_show <= self.time_prediction + k:
                 # создание предсказания место появления снаряда
                 self.draw_prediction()
-            self.ticks_to_show -= 1

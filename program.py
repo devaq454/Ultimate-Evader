@@ -17,8 +17,8 @@ class GameScene:
     @classmethod
     def change_background(cls) -> pygame.Surface:
         """Устанавливает заданный задний фон, зависящий от уровня"""
-        global background
-        background = pygame.image.load('data/background.png')
+        global background, level
+        background = pygame.image.load(f'data/background_{level % 4}.png')
         background = pygame.transform.scale(background, (w, h))
         return background
 
@@ -123,7 +123,6 @@ pygame_clock = pygame.time.Clock()
 
 # значения по умолчанию
 tick = 0
-background = GameScene.change_background()
 running = True
 # Статус паузы
 status_pause = True
@@ -134,6 +133,7 @@ time_immortality = 0
 # последний лвл, когда изменялся задний фон
 last_level = -1
 is_game_over = False
+background = GameScene.change_background()
 
 # максимальное время респавна снарядов
 respawn_ticks = 4 * fps
